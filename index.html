@@ -388,6 +388,7 @@
 
     .form-group {
       margin-bottom: 15px;
+      position: relative;
     }
 
     .form-row {
@@ -419,7 +420,55 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--neon-pink);
-      box-shadow: 0 0 10px rgba(ff, 0, 85, 0.4);
+      box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+    }
+
+    /* Live Search Results Dropdown */
+    #searchResults {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #0a0b14;
+      border: 1px solid var(--neon-cyan);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    }
+
+    .search-result-item {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+
+    .search-result-item:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .search-result-item img {
+      width: 35px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .search-result-info {
+      font-family: var(--font-title);
+      font-size: 0.85rem;
+      color: #fff;
+    }
+
+    .search-result-sub {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
     }
 
     .score-slider-group {
@@ -571,8 +620,9 @@
         <input type="hidden" id="animeId">
 
         <div class="form-group">
-          <label>Anime Title *</label>
-          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners">
+          <label>Anime Title (Type to Search Online) *</label>
+          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners" oninput="searchAnimeAPI(this.value)" autocomplete="off">
+          <div id="searchResults"></div>
         </div>
 
         <div class="form-row">
@@ -658,6 +708,7 @@
 
   <script>
     let animeList = JSON.parse(localStorage.getItem('cyberRankAnimeData')) || [];
+    let searchTimeout = null;
 
     function saveToStorage() {
       localStorage.setItem('cyberRankAnimeData', JSON.stringify(animeList));
@@ -685,6 +736,7 @@
       document.getElementById('modalTitle').innerText = "MANUAL ANIME ENTRY";
       document.getElementById('animeId').value = "";
       document.getElementById('animeForm').reset();
+      document.getElementById('searchResults').style.display = 'none';
       
       ['Characters', 'Story', 'Emotion', 'Ending', 'Rewatch'].forEach(cat => {
         updateScoreVal(cat, 8.0);
@@ -695,6 +747,62 @@
 
     function closeModal() {
       document.getElementById('animeModal').classList.remove('active');
+      document.getElementById('searchResults').style.display = 'none';
+    }
+
+    // Live Anime Search using Jikan API (MyAnimeList)
+    function searchAnimeAPI(query) {
+      clearTimeout(searchTimeout);
+      const resultsContainer = document.getElementById('searchResults');
+      
+      if (!query || query.trim().length < 2) {
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      searchTimeout = setTimeout(() => {
+        fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.data && data.data.length > 0) {
+              resultsContainer.innerHTML = data.data.map(anime => {
+                const title = anime.title_english || anime.title;
+                const poster = anime.images?.jpg?.image_url || '';
+                const year = anime.year || (anime.aired?.from ? new Date(anime.aired.from).getFullYear() : '?');
+                const eps = anime.episodes || '?';
+                const type = anime.type || 'TV';
+                
+                return `
+                  <div class="search-result-item" onclick="selectSearchedAnime('${encodeURIComponent(title)}', '${poster}', '${eps}', '${year}', '${type}')">
+                    <img src="${poster}" alt="Thumb" onerror="this.src='https://via.placeholder.com/35x50/0a0b14/00f3ff?text=?'">
+                    <div>
+                      <div class="search-result-info">${title}</div>
+                      <div class="search-result-sub">${type} • ${year} • ${eps} EPS</div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+              resultsContainer.style.display = 'block';
+            } else {
+              resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ NO MATCH FOUND ]</div>`;
+              resultsContainer.style.display = 'block';
+            }
+          })
+          .catch(err => {
+            console.error("Connection error:", err);
+            resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--neon-pink);">[ CONNECTION ERROR / RATE LIMITED ]</div>`;
+            resultsContainer.style.display = 'block';
+          });
+      }, 400);
+    }
+
+    function selectSearchedAnime(title, poster, episodes, year, type) {
+      document.getElementById('animeTitle').value = decodeURIComponent(title);
+      document.getElementById('animePoster').value = poster;
+      document.getElementById('animeEpisodes').value = episodes === 'null' ? '' : episodes;
+      document.getElementById('animeYear').value = year === 'null' ? '' : year;
+      document.getElementById('animeFormat').value = ['TV', 'OVA', 'Movie', 'Special', 'ONA', 'Music'].includes(type) ? type : 'TV';
+      document.getElementById('searchResults').style.display = 'none';
     }
 
     function calculateOverall(scores) {
@@ -723,13 +831,11 @@
       const overall = parseFloat(calculateOverall(scores));
 
       if (id) {
-        // Edit existing
         const idx = animeList.findIndex(a => a.id === id);
         if (idx !== -1) {
           animeList[idx] = { ...animeList[idx], title, format, poster, episodes, year, scores, overall };
         }
       } else {
-        // Add new (append to end for watch order)
         const newAnime = {
           id: Date.now().toString(),
           watchOrder: animeList.length + 1,
@@ -752,7 +858,6 @@
     function deleteAnime(id) {
       if (confirm("Are you sure you want to delete this anime ranking?")) {
         animeList = animeList.filter(a => a.id !== id);
-        // Re-index watch order sequence
         animeList.forEach((item, index) => {
           item.watchOrder = index + 1;
         });
@@ -775,7 +880,6 @@
         animeList[idx + 1] = temp;
       }
 
-      // Re-assign explicit sequence numbers
       animeList.forEach((item, index) => {
         item.watchOrder = index + 1;
       });
@@ -859,7 +963,6 @@
     }
 
     function renderTables() {
-      // 1. Render Watch Order Table
       const watchOrderTbody = document.getElementById('watchOrderTableBody');
       const watchEmpty = document.getElementById('watchOrderEmpty');
       
@@ -871,7 +974,6 @@
         watchOrderTbody.innerHTML = animeList.map((anime, index) => createRowHTML(anime, index + 1, true)).join('');
       }
 
-      // 2. Render Score Rank Table
       const scoreRankTbody = document.getElementById('scoreRankTableBody');
       const scoreEmpty = document.getElementById('scoreRankEmpty');
 
@@ -880,7 +982,6 @@
         scoreEmpty.style.display = 'block';
       } else {
         scoreEmpty.style.display = 'none';
-        // Sort descending by overall score
         const sortedList = [...animeList].sort((a, b) => b.overall - a.overall);
         scoreRankTbody.innerHTML = sortedList.map((anime, index) => createRowHTML(anime, index + 1, false)).join('');
       }
@@ -919,7 +1020,6 @@
       reader.readAsText(file);
     }
 
-    // Initial render on load
     renderTables();
   </script>
 </body>
