@@ -485,45 +485,77 @@
       border-radius: 2px;
     }
 
-    .score-slider-group {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 10px;
+    /* Selected Anime Preview Card inside Modal */
+    .selected-anime-preview {
+      border: 1px solid var(--border-glow);
+      background: rgba(0, 243, 255, 0.03);
+      padding: 15px;
       border-radius: 4px;
-      margin-bottom: 10px;
-    }
-
-    .score-label-val {
+      margin-bottom: 20px;
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .selected-anime-preview img {
+      width: 60px;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .score-input-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glow);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .score-input-card label {
       font-family: var(--font-title);
-      font-size: 0.85rem;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
     }
 
-    .score-val-num {
-      color: var(--neon-yellow);
+    .score-input-card input {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
       font-weight: bold;
-    }
-
-    input[type="range"] {
-      accent-color: var(--neon-cyan);
-      cursor: pointer;
+      color: var(--neon-yellow);
+      text-align: center;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid rgba(0, 243, 255, 0.3);
     }
 
     .personal-score-box {
       border: 1px solid var(--neon-yellow);
       background: rgba(255, 230, 0, 0.03);
-      padding: 12px;
+      padding: 15px;
       border-radius: 4px;
       margin-top: 15px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .personal-score-box label {
       color: var(--neon-yellow);
+      font-size: 0.8rem;
     }
 
-    /* Backup Panel matching image style */
+    .personal-score-box input {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--neon-yellow);
+      text-align: center;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--neon-yellow);
+    }
+
+    /* Backup Panel */
     .backup-panel {
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
@@ -655,7 +687,7 @@
     </div>
   </div>
 
-  <!-- Add/Edit Modal matching search & rank styling -->
+  <!-- Add/Edit Modal -->
   <div class="modal-overlay" id="animeModal">
     <div class="modal-container">
       <div class="modal-header">
@@ -665,72 +697,68 @@
 
       <form id="animeForm" onsubmit="saveAnime(event)">
         <input type="hidden" id="animeId">
+        <input type="hidden" id="animeTitle" value="">
         <input type="hidden" id="animePoster" value="">
         <input type="hidden" id="animeEpisodes" value="12">
         <input type="hidden" id="animeYear" value="2023">
         <input type="hidden" id="animeFormat" value="TV">
 
-        <div class="form-group">
-          <label>Anime Title *</label>
-          <input type="text" id="animeTitle" required placeholder="Type to search database..." oninput="handleSearch(this.value)" autocomplete="off">
+        <!-- Search Input Bar -->
+        <div class="form-group" id="searchGroup">
+          <label>Search Anime *</label>
+          <input type="text" id="animeSearchInput" placeholder="Type to search database..." oninput="handleSearch(this.value)" autocomplete="off">
           <div id="searchResults"></div>
         </div>
 
-        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 15px; text-transform: uppercase;">
+        <!-- Auto-Populated Preview Card (Appears after choosing anime) -->
+        <div class="selected-anime-preview" id="selectedPreview" style="display: none;">
+          <img id="previewImg" src="" alt="Cover">
+          <div>
+            <div id="previewTitle" style="font-family: var(--font-title); font-size: 1.1rem; color: #fff; font-weight: 700; margin-bottom: 4px;"></div>
+            <div id="previewMeta" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);"></div>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--neon-cyan); margin: 15px 0 10px 0; text-transform: uppercase; letter-spacing: 1px;">
           YOUR POINT BREAKDOWN (0.0 TO 10.0)
         </div>
 
-        <div class="score-slider-group">
-          <div class="score-label-val">
-            <span>CHARACTERS</span>
-            <span class="score-val-num" id="valCharacters">8.0</span>
+        <!-- Number Input Grid (No Sliders) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="score-input-card">
+            <label>CHARACTERS</label>
+            <input type="number" id="scoreCharacters" min="0" max="10" step="0.1" value="8.0" required>
           </div>
-          <input type="range" id="scoreCharacters" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Characters', this.value)">
+          <div class="score-input-card">
+            <label>STORY</label>
+            <input type="number" id="scoreStory" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
         </div>
 
-        <div class="score-slider-group">
-          <div class="score-label-val">
-            <span>STORY</span>
-            <span class="score-val-num" id="valStory">8.0</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="score-input-card">
+            <label>EMOTIONAL IMPACT</label>
+            <input type="number" id="scoreEmotion" min="0" max="10" step="0.1" value="8.0" required>
           </div>
-          <input type="range" id="scoreStory" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Story', this.value)">
+          <div class="score-input-card">
+            <label>ENDING</label>
+            <input type="number" id="scoreEnding" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
         </div>
 
-        <div class="score-slider-group">
-          <div class="score-label-val">
-            <span>EMOTIONAL IMPACT</span>
-            <span class="score-val-num" id="valEmotion">8.0</span>
-          </div>
-          <input type="range" id="scoreEmotion" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Emotion', this.value)">
+        <div class="score-input-card">
+          <label>REWATCHABILITY</label>
+          <input type="number" id="scoreRewatch" min="0" max="10" step="0.1" value="8.0" required>
         </div>
 
-        <div class="score-slider-group">
-          <div class="score-label-val">
-            <span>ENDING</span>
-            <span class="score-val-num" id="valEnding">8.0</span>
-          </div>
-          <input type="range" id="scoreEnding" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Ending', this.value)">
-        </div>
-
-        <div class="score-slider-group">
-          <div class="score-label-val">
-            <span>REWATCHABILITY</span>
-            <span class="score-val-num" id="valRewatch">8.0</span>
-          </div>
-          <input type="range" id="scoreRewatch" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Rewatch', this.value)">
-        </div>
-
-        <!-- Personal Score box matching image reference -->
+        <!-- Personal Score Box -->
         <div class="personal-score-box">
-          <div class="score-label-val" style="margin-bottom: 5px;">
-            <label>★ PERSONAL SCORE (USED FOR LEADERBOARD RANKING)</label>
-            <span class="score-val-num" id="valPersonal">8.0</span>
-          </div>
-          <input type="range" id="scorePersonal" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Personal', this.value)">
+          <label style="margin-bottom: 6px; display: block;">★ PERSONAL SCORE (USED FOR LEADERBOARD RANKING)</label>
+          <input type="number" id="scorePersonal" min="0" max="10" step="0.1" value="8.0" required>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-top: 20px;">
-          <button type="button" class="cyber-btn" onclick="closeModal()" style="justify-content: center;">CHANGE</button>
+          <button type="button" class="cyber-btn" onclick="resetSelection()" style="justify-content: center;">CHANGE</button>
           <button type="submit" class="cyber-btn cyber-btn-cyan" style="justify-content: center;">CONFIRM & SAVE RANK</button>
         </div>
       </form>
@@ -742,6 +770,7 @@
     let currentFormatFilter = 'ALL';
 
     const animeCatalog = [
+      { title: "Bleach", type: "TV", episodes: 366, year: 2004, poster: "https://cdn.myanimelist.net/images/anime/3/40451.jpg" },
       { title: "Cyberpunk: Edgerunners", type: "TV", episodes: 10, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1818/127112.jpg" },
       { title: "Attack on Titan", type: "TV", episodes: 25, year: 2013, poster: "https://cdn.myanimelist.net/images/anime/10/47347.jpg" },
       { title: "Steins;Gate", type: "TV", episodes: 24, year: 2011, poster: "https://cdn.myanimelist.net/images/anime/5/73199.jpg" },
@@ -781,20 +810,22 @@
       renderTables();
     }
 
-    function updateScoreVal(cat, val) {
-      document.getElementById('val' + cat).innerText = parseFloat(val).toFixed(1);
-    }
-
     function openAddModal() {
       document.getElementById('modalTitle').innerText = "SEARCH & RANK ANIME";
       document.getElementById('animeId').value = "";
       document.getElementById('animeForm').reset();
-      document.getElementById('animePoster').value = 'https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER';
-      document.getElementById('searchResults').style.display = 'none';
       
-      ['Characters', 'Story', 'Emotion', 'Ending', 'Rewatch', 'Personal'].forEach(cat => {
-        updateScoreVal(cat, 8.0);
-      });
+      // Reset search view
+      document.getElementById('searchGroup').style.display = 'block';
+      document.getElementById('selectedPreview').style.display = 'none';
+      document.getElementById('searchResults').style.display = 'none';
+
+      document.getElementById('scoreCharacters').value = 8.0;
+      document.getElementById('scoreStory').value = 8.0;
+      document.getElementById('scoreEmotion').value = 8.0;
+      document.getElementById('scoreEnding').value = 8.0;
+      document.getElementById('scoreRewatch').value = 8.0;
+      document.getElementById('scorePersonal').value = 8.0;
 
       document.getElementById('animeModal').classList.add('active');
     }
@@ -802,6 +833,14 @@
     function closeModal() {
       document.getElementById('animeModal').classList.remove('active');
       document.getElementById('searchResults').style.display = 'none';
+    }
+
+    function resetSelection() {
+      document.getElementById('animeTitle').value = '';
+      document.getElementById('searchGroup').style.display = 'block';
+      document.getElementById('selectedPreview').style.display = 'none';
+      document.getElementById('animeSearchInput').value = '';
+      document.getElementById('animeSearchInput').focus();
     }
 
     function handleSearch(query) {
@@ -824,7 +863,7 @@
         `).join('');
         resultsContainer.style.display = 'block';
       } else {
-        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ CUSTOM ENTRY MODE: Type details manually ]</div>`;
+        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ NO MATCH FOUND ]</div>`;
         resultsContainer.style.display = 'block';
       }
     }
@@ -835,6 +874,15 @@
       document.getElementById('animeEpisodes').value = episodes;
       document.getElementById('animeYear').value = year;
       document.getElementById('animeFormat').value = type;
+
+      // Populate preview card
+      document.getElementById('previewImg').src = poster;
+      document.getElementById('previewTitle').innerText = title;
+      document.getElementById('previewMeta').innerText = `${type} • ${year} • ${episodes} EPS`;
+
+      // Hide search bar, show preview card
+      document.getElementById('searchGroup').style.display = 'none';
+      document.getElementById('selectedPreview').style.display = 'flex';
       document.getElementById('searchResults').style.display = 'none';
     }
 
@@ -843,20 +891,26 @@
       
       const id = document.getElementById('animeId').value;
       const title = document.getElementById('animeTitle').value;
+
+      if (!title) {
+        alert("Please search and select an anime first!");
+        return;
+      }
+
       const format = document.getElementById('animeFormat').value || 'TV';
       const poster = document.getElementById('animePoster').value || 'https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER';
       const episodes = document.getElementById('animeEpisodes').value || '?';
       const year = document.getElementById('animeYear').value || '?';
 
       const scores = {
-        characters: parseFloat(document.getElementById('scoreCharacters').value),
-        story: parseFloat(document.getElementById('scoreStory').value),
-        emotion: parseFloat(document.getElementById('scoreEmotion').value),
-        ending: parseFloat(document.getElementById('scoreEnding').value),
-        rewatch: parseFloat(document.getElementById('scoreRewatch').value)
+        characters: parseFloat(document.getElementById('scoreCharacters').value) || 0,
+        story: parseFloat(document.getElementById('scoreStory').value) || 0,
+        emotion: parseFloat(document.getElementById('scoreEmotion').value) || 0,
+        ending: parseFloat(document.getElementById('scoreEnding').value) || 0,
+        rewatch: parseFloat(document.getElementById('scoreRewatch').value) || 0
       };
 
-      const overall = parseFloat(document.getElementById('scorePersonal').value);
+      const overall = parseFloat(document.getElementById('scorePersonal').value) || 0;
 
       if (id) {
         const idx = animeList.findIndex(a => a.id === id);
@@ -928,23 +982,20 @@
       document.getElementById('animeEpisodes').value = anime.episodes;
       document.getElementById('animeYear').value = anime.year;
 
+      // Populate preview card directly
+      document.getElementById('previewImg').src = anime.poster;
+      document.getElementById('previewTitle').innerText = anime.title;
+      document.getElementById('previewMeta').innerText = `${anime.format || 'TV'} • ${anime.year} • ${anime.episodes} EPS`;
+
+      document.getElementById('searchGroup').style.display = 'none';
+      document.getElementById('selectedPreview').style.display = 'flex';
+
       document.getElementById('scoreCharacters').value = anime.scores.characters;
-      updateScoreVal('Characters', anime.scores.characters);
-
       document.getElementById('scoreStory').value = anime.scores.story;
-      updateScoreVal('Story', anime.scores.story);
-
       document.getElementById('scoreEmotion').value = anime.scores.emotion;
-      updateScoreVal('Emotion', anime.scores.emotion);
-
       document.getElementById('scoreEnding').value = anime.scores.ending;
-      updateScoreVal('Ending', anime.scores.ending);
-
       document.getElementById('scoreRewatch').value = anime.scores.rewatch;
-      updateScoreVal('Rewatch', anime.scores.rewatch);
-
       document.getElementById('scorePersonal').value = anime.overall;
-      updateScoreVal('Personal', anime.overall);
 
       document.getElementById('animeModal').classList.add('active');
     }
@@ -999,7 +1050,6 @@
         filteredList = animeList.filter(a => (a.format || 'TV').toUpperCase() === currentFormatFilter);
       }
 
-      // 1. Watch Order View
       const watchOrderTbody = document.getElementById('watchOrderTableBody');
       const watchEmpty = document.getElementById('watchOrderEmpty');
       
@@ -1011,7 +1061,6 @@
         watchOrderTbody.innerHTML = filteredList.map((anime, index) => createRowHTML(anime, index + 1, true)).join('');
       }
 
-      // 2. Score Ranking View
       const scoreRankTbody = document.getElementById('scoreRankTableBody');
       const scoreEmpty = document.getElementById('scoreRankEmpty');
 
