@@ -692,15 +692,14 @@
 
       <form id="animeForm" onsubmit="saveAnime(event)">
         <input type="hidden" id="animeId">
-        <input type="hidden" id="animeTitle" value="">
         <input type="hidden" id="animePoster" value="">
-        <input type="hidden" id="animeEpisodes" value="12">
-        <input type="hidden" id="animeYear" value="2023">
+        <input type="hidden" id="animeEpisodes" value="?">
+        <input type="hidden" id="animeYear" value="?">
         <input type="hidden" id="animeFormat" value="TV">
 
         <div class="form-group" id="searchGroup">
-          <label>Search Global Database *</label>
-          <input type="text" id="animeSearchInput" placeholder="Type any anime name (TV, Movie, OVA, Special)..." oninput="handleSearch(this.value)" autocomplete="off">
+          <label>SEARCH GLOBAL DATABASE *</label>
+          <input type="text" id="animeSearchInput" placeholder="Type any anime name..." oninput="handleSearch(this.value)" autocomplete="off">
           <div id="searchResults"></div>
         </div>
 
@@ -761,7 +760,6 @@
     let currentFormatFilter = 'ALL';
     let searchTimeout = null;
 
-    // Fast local fallback database
     const localFallbackCatalog = [
       { title: "Bleach", type: "TV", episodes: 366, year: 2004, poster: "https://cdn.myanimelist.net/images/anime/3/40451.jpg" },
       { title: "Cyberpunk: Edgerunners", type: "TV", episodes: 10, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1818/127112.jpg" },
@@ -772,10 +770,7 @@
       { title: "Jujutsu Kaisen", type: "TV", episodes: 24, year: 2020, poster: "https://cdn.myanimelist.net/images/anime/1175/109205.jpg" },
       { title: "Demon Slayer", type: "TV", episodes: 26, year: 2019, poster: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg" },
       { title: "Chainsaw Man", type: "TV", episodes: 12, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1806/126216.jpg" },
-      { title: "Solo Leveling", type: "TV", episodes: 12, year: 2024, poster: "https://cdn.myanimelist.net/images/anime/1937/140410.jpg" },
-      { title: "Josee, the Tiger and the Fish", type: "MOVIE", episodes: 1, year: 2020, poster: "https://cdn.myanimelist.net/images/anime/1550/111893.jpg" },
-      { title: "Spirited Away", type: "MOVIE", episodes: 1, year: 2001, poster: "https://cdn.myanimelist.net/images/anime/1222/115517.jpg" },
-      { title: "Your Name.", type: "MOVIE", episodes: 1, year: 2016, poster: "https://cdn.myanimelist.net/images/anime/5/87048.jpg" }
+      { title: "Solo Leveling", type: "TV", episodes: 12, year: 2024, poster: "https://cdn.myanimelist.net/images/anime/1937/140410.jpg" }
     ];
 
     function saveToStorage() {
@@ -828,14 +823,12 @@
     }
 
     function resetSelection() {
-      document.getElementById('animeTitle').value = '';
       document.getElementById('searchGroup').style.display = 'block';
       document.getElementById('selectedPreview').style.display = 'none';
       document.getElementById('animeSearchInput').value = '';
       document.getElementById('animeSearchInput').focus();
     }
 
-    // Hybrid Search: Tries live global Jikan API first, falls back smoothly to local catalog
     function handleSearch(query) {
       const resultsContainer = document.getElementById('searchResults');
       if (!query || query.trim().length < 2) {
@@ -889,13 +882,12 @@
         `).join('');
         resultsContainer.style.display = 'block';
       } else {
-        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ NO ANIME FOUND ]</div>`;
+        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);" onclick="selectCustomAnime('${query.replace(/'/g, "\\'")}')">[ CLICK TO USE TYPED NAME: "${query}" ]</div>`;
         resultsContainer.style.display = 'block';
       }
     }
 
     function selectCatalogAnime(title, poster, episodes, year, type) {
-      document.getElementById('animeTitle').value = title;
       document.getElementById('animePoster').value = poster;
       document.getElementById('animeEpisodes').value = episodes;
       document.getElementById('animeYear').value = year;
@@ -908,16 +900,26 @@
       document.getElementById('searchGroup').style.display = 'none';
       document.getElementById('selectedPreview').style.display = 'flex';
       document.getElementById('searchResults').style.display = 'none';
+      document.getElementById('animeSearchInput').value = '';
+    }
+
+    function selectCustomAnime(title) {
+      selectCatalogAnime(title, 'https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER', '?', '?', 'TV');
     }
 
     function saveAnime(e) {
       e.preventDefault();
       
       const id = document.getElementById('animeId').value;
-      const title = document.getElementById('animeTitle').value;
+      
+      // Auto-grab whatever is typed in the search input if a selection wasn't officially locked in
+      let title = document.getElementById('previewTitle').innerText;
+      if (!title) {
+        title = document.getElementById('animeSearchInput').value.trim();
+      }
 
       if (!title) {
-        alert("Please search and select an anime first!");
+        alert("Please search or type an anime title first!");
         return;
       }
 
@@ -1000,7 +1002,6 @@
 
       document.getElementById('modalTitle').innerText = "EDIT ANIME RANKING";
       document.getElementById('animeId').value = anime.id;
-      document.getElementById('animeTitle').value = anime.title;
       document.getElementById('animeFormat').value = anime.format || 'TV';
       document.getElementById('animePoster').value = anime.poster;
       document.getElementById('animeEpisodes').value = anime.episodes;
