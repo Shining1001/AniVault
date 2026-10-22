@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg-base: #05050a;
@@ -46,7 +45,6 @@
       padding-bottom: 60px;
     }
 
-    /* Cyber Header */
     header {
       background: rgba(8, 9, 18, 0.9);
       border-bottom: 2px solid var(--neon-cyan);
@@ -89,7 +87,6 @@
       padding: 25px 20px;
     }
 
-    /* Control Bar */
     .control-panel {
       display: flex;
       flex-wrap: wrap;
@@ -170,7 +167,6 @@
       box-shadow: 0 0 20px var(--neon-cyan);
     }
 
-    /* Leaderboard Tables */
     .leaderboard-view {
       display: none;
     }
@@ -332,7 +328,6 @@
       box-shadow: 0 0 8px var(--neon-pink);
     }
 
-    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -423,7 +418,6 @@
       box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
     }
 
-    /* Live Search Results Dropdown */
     #searchResults {
       position: absolute;
       top: 100%;
@@ -496,7 +490,6 @@
       cursor: pointer;
     }
 
-    /* Backup Section */
     .backup-panel {
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
@@ -535,7 +528,6 @@
   </header>
 
   <div class="container">
-    <!-- Navigation & Action Controls -->
     <div class="control-panel">
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('watchOrder')">1. WATCH ORDER</button>
@@ -544,7 +536,7 @@
       <button class="cyber-btn cyber-btn-cyan" onclick="openAddModal()">+ ADD ANIME</button>
     </div>
 
-    <!-- Leaderboard 1: Watch Order -->
+    <!-- Watch Order View -->
     <div id="watchOrderView" class="leaderboard-view active">
       <div class="leaderboard-card">
         <table class="anime-table">
@@ -559,17 +551,15 @@
               <th style="text-align: center;">ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="watchOrderTableBody">
-            <!-- Dynamic rows -->
-          </tbody>
+          <tbody id="watchOrderTableBody"></tbody>
         </table>
         <div id="watchOrderEmpty" class="empty-state" style="display:none;">
-          [ SYSTEM EMPTY ] No anime added yet. Click "+ ADD ANIME" to add your first watched anime!
+          [ SYSTEM EMPTY ] No anime added yet. Click "+ ADD ANIME" to get started!
         </div>
       </div>
     </div>
 
-    <!-- Leaderboard 2: Score Ranking -->
+    <!-- Score Ranking View -->
     <div id="scoreRankView" class="leaderboard-view">
       <div class="leaderboard-card">
         <table class="anime-table">
@@ -584,9 +574,7 @@
               <th style="text-align: center;">ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="scoreRankTableBody">
-            <!-- Dynamic rows -->
-          </tbody>
+          <tbody id="scoreRankTableBody"></tbody>
         </table>
         <div id="scoreRankEmpty" class="empty-state" style="display:none;">
           [ SYSTEM EMPTY ] No ranked anime found.
@@ -594,11 +582,11 @@
       </div>
     </div>
 
-    <!-- Data Backup & Restore -->
+    <!-- Data Management Panel -->
     <div class="backup-panel">
       <div>
         <h4 style="font-family: var(--font-title); color: #fff;">DATA MANAGEMENT</h4>
-        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">Save backups or restore your list across devices</p>
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">Backup or restore your database JSON files</p>
       </div>
       <div style="display: flex; gap: 10px;">
         <button class="cyber-btn" onclick="exportData()" style="border-color: var(--neon-green); color: var(--neon-green);">EXPORT JSON</button>
@@ -608,7 +596,7 @@
     </div>
   </div>
 
-  <!-- Add/Edit Anime Modal -->
+  <!-- Add/Edit Modal -->
   <div class="modal-overlay" id="animeModal">
     <div class="modal-container">
       <div class="modal-header">
@@ -620,8 +608,8 @@
         <input type="hidden" id="animeId">
 
         <div class="form-group">
-          <label>Anime Title (Type to Search) *</label>
-          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners" oninput="searchAnime(this.value)" autocomplete="off">
+          <label>Anime Title (Type to Search Database) *</label>
+          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners" oninput="handleSearch(this.value)" autocomplete="off">
           <div id="searchResults"></div>
         </div>
 
@@ -658,7 +646,6 @@
           POINT BREAKDOWN (0.0 - 10.0)
         </h4>
 
-        <!-- Category Sliders -->
         <div class="score-slider-group">
           <div class="score-label-val">
             <span>CHARACTERS</span>
@@ -708,10 +695,9 @@
 
   <script>
     let animeList = JSON.parse(localStorage.getItem('cyberRankAnimeData')) || [];
-    let searchTimeout = null;
 
-    // Guaranteed built-in offline database fallback so search never breaks or errors out
-    const offlineDatabase = [
+    // Instant local high-speed searchable catalog with posters and stats
+    const animeCatalog = [
       { title: "Cyberpunk: Edgerunners", type: "TV", episodes: 10, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1818/127112.jpg" },
       { title: "Attack on Titan", type: "TV", episodes: 25, year: 2013, poster: "https://cdn.myanimelist.net/images/anime/10/47347.jpg" },
       { title: "Steins;Gate", type: "TV", episodes: 24, year: 2011, poster: "https://cdn.myanimelist.net/images/anime/5/73199.jpg" },
@@ -729,7 +715,9 @@
       { title: "Cowboy Bebop", type: "TV", episodes: 26, year: 1998, poster: "https://cdn.myanimelist.net/images/anime/4/19644.jpg" },
       { title: "Neon Genesis Evangelion", type: "TV", episodes: 26, year: 1995, poster: "https://cdn.myanimelist.net/images/anime/1314/108941.jpg" },
       { title: "Spirited Away", type: "Movie", episodes: 1, year: 2001, poster: "https://cdn.myanimelist.net/images/anime/1222/115517.jpg" },
-      { title: "Your Name.", type: "Movie", episodes: 1, year: 2016, poster: "https://cdn.myanimelist.net/images/anime/5/87048.jpg" }
+      { title: "Your Name.", type: "Movie", episodes: 1, year: 2016, poster: "https://cdn.myanimelist.net/images/anime/5/87048.jpg" },
+      { title: "Solo Leveling", type: "TV", episodes: 12, year: 2024, poster: "https://cdn.myanimelist.net/images/anime/1937/140410.jpg" },
+      { title: "Frieren: Beyond Journey's End", type: "TV", episodes: 28, year: 2023, poster: "https://cdn.myanimelist.net/images/anime/1015/138006.jpg" }
     ];
 
     function saveToStorage() {
@@ -772,73 +760,37 @@
       document.getElementById('searchResults').style.display = 'none';
     }
 
-    // Hybrid Search: Tries online Jikan API first; if it errors or fails, instantly falls back to the offline database seamlessly
-    function searchAnime(query) {
-      clearTimeout(searchTimeout);
+    function handleSearch(query) {
       const resultsContainer = document.getElementById('searchResults');
-      
-      if (!query || query.trim().length < 1) {
+      if (!query || query.trim().length === 0) {
         resultsContainer.style.display = 'none';
         return;
       }
 
-      searchTimeout = setTimeout(() => {
-        fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`)
-          .then(res => {
-            if (!res.ok) throw new Error("API rate-limited or blocked");
-            return res.json();
-          })
-          .then(data => {
-            if (data && data.data && data.data.length > 0) {
-              displaySearchResults(data.data.map(anime => ({
-                title: anime.title_english || anime.title,
-                poster: anime.images?.jpg?.image_url || '',
-                episodes: anime.episodes || '?',
-                year: anime.year || (anime.aired?.from ? new Date(anime.aired.from).getFullYear() : '?'),
-                type: anime.type || 'TV'
-              })));
-            } else {
-              triggerOfflineSearch(query);
-            }
-          })
-          .catch(() => {
-            triggerOfflineSearch(query);
-          });
-      }, 300);
-    }
-
-    function triggerOfflineSearch(query) {
-      const resultsContainer = document.getElementById('searchResults');
-      const filtered = offlineDatabase.filter(a => a.title.toLowerCase().includes(query.toLowerCase()));
-      
-      if (filtered.length > 0) {
-        displaySearchResults(filtered);
+      const matches = animeCatalog.filter(a => a.title.toLowerCase().includes(query.toLowerCase()));
+      if (matches.length > 0) {
+        resultsContainer.innerHTML = matches.map(anime => `
+          <div class="search-result-item" onclick="selectCatalogAnime('${anime.title.replace(/'/g, "\\'")}', '${anime.poster}', ${anime.episodes}, ${anime.year}, '${anime.type}')">
+            <img src="${anime.poster}" alt="Thumb" onerror="this.src='https://via.placeholder.com/35x50/0a0b14/00f3ff?text=?'">
+            <div>
+              <div class="search-result-info">${anime.title}</div>
+              <div class="search-result-sub">${anime.type} • ${anime.year} • ${anime.episodes} EPS</div>
+            </div>
+          </div>
+        `).join('');
+        resultsContainer.style.display = 'block';
       } else {
         resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ CUSTOM ENTRY MODE: Type details manually ]</div>`;
         resultsContainer.style.display = 'block';
       }
     }
 
-    function displaySearchResults(items) {
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.innerHTML = items.map(anime => `
-        <div class="search-result-item" onclick="selectSearchedAnime('${encodeURIComponent(anime.title)}', '${anime.poster}', '${anime.episodes}', '${anime.year}', '${anime.type}')">
-          <img src="${anime.poster}" alt="Thumb" onerror="this.src='https://via.placeholder.com/35x50/0a0b14/00f3ff?text=?'">
-          <div>
-            <div class="search-result-info">${anime.title}</div>
-            <div class="search-result-sub">${anime.type} • ${anime.year} • ${anime.episodes} EPS</div>
-          </div>
-        </div>
-      `).join('');
-      resultsContainer.style.display = 'block';
-    }
-
-    function selectSearchedAnime(title, poster, episodes, year, type) {
-      document.getElementById('animeTitle').value = decodeURIComponent(title);
+    function selectCatalogAnime(title, poster, episodes, year, type) {
+      document.getElementById('animeTitle').value = title;
       document.getElementById('animePoster').value = poster;
-      document.getElementById('animeEpisodes').value = episodes === 'null' ? '' : episodes;
-      document.getElementById('animeYear').value = year === 'null' ? '' : year;
-      document.getElementById('animeFormat').value = ['TV', 'OVA', 'Movie', 'Special', 'ONA', 'Music'].includes(type) ? type : 'TV';
+      document.getElementById('animeEpisodes').value = episodes;
+      document.getElementById('animeYear').value = year;
+      document.getElementById('animeFormat').value = type;
       document.getElementById('searchResults').style.display = 'none';
     }
 
