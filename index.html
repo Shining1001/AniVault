@@ -620,8 +620,8 @@
         <input type="hidden" id="animeId">
 
         <div class="form-group">
-          <label>Anime Title (Type to Search Online) *</label>
-          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners" oninput="searchAnimeAPI(this.value)" autocomplete="off">
+          <label>Anime Title (Type to Search) *</label>
+          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners" oninput="searchAnime(this.value)" autocomplete="off">
           <div id="searchResults"></div>
         </div>
 
@@ -710,6 +710,28 @@
     let animeList = JSON.parse(localStorage.getItem('cyberRankAnimeData')) || [];
     let searchTimeout = null;
 
+    // Guaranteed built-in offline database fallback so search never breaks or errors out
+    const offlineDatabase = [
+      { title: "Cyberpunk: Edgerunners", type: "TV", episodes: 10, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1818/127112.jpg" },
+      { title: "Attack on Titan", type: "TV", episodes: 25, year: 2013, poster: "https://cdn.myanimelist.net/images/anime/10/47347.jpg" },
+      { title: "Steins;Gate", type: "TV", episodes: 24, year: 2011, poster: "https://cdn.myanimelist.net/images/anime/5/73199.jpg" },
+      { title: "Fullmetal Alchemist: Brotherhood", type: "TV", episodes: 64, year: 2009, poster: "https://cdn.myanimelist.net/images/anime/1223/96541.jpg" },
+      { title: "Death Note", type: "TV", episodes: 37, year: 2006, poster: "https://cdn.myanimelist.net/images/anime/9/9453.jpg" },
+      { title: "Bleach", type: "TV", episodes: 366, year: 2004, poster: "https://cdn.myanimelist.net/images/anime/3/40451.jpg" },
+      { title: "Naruto", type: "TV", episodes: 220, year: 2002, poster: "https://cdn.myanimelist.net/images/anime/13/17405.jpg" },
+      { title: "One Piece", type: "TV", episodes: 1000, year: 1999, poster: "https://cdn.myanimelist.net/images/anime/6/73245.jpg" },
+      { title: "Jujutsu Kaisen", type: "TV", episodes: 24, year: 2020, poster: "https://cdn.myanimelist.net/images/anime/1175/109205.jpg" },
+      { title: "Demon Slayer: Kimetsu no Yaiba", type: "TV", episodes: 26, year: 2019, poster: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg" },
+      { title: "Chainsaw Man", type: "TV", episodes: 12, year: 2022, poster: "https://cdn.myanimelist.net/images/anime/1806/126216.jpg" },
+      { title: "Vinland Saga", type: "TV", episodes: 24, year: 2019, poster: "https://cdn.myanimelist.net/images/anime/1500/103035.jpg" },
+      { title: "Hunter x Hunter", type: "TV", episodes: 148, year: 2011, poster: "https://cdn.myanimelist.net/images/anime/1337/99013.jpg" },
+      { title: "Mob Psycho 100", type: "TV", episodes: 12, year: 2016, poster: "https://cdn.myanimelist.net/images/anime/8/80419.jpg" },
+      { title: "Cowboy Bebop", type: "TV", episodes: 26, year: 1998, poster: "https://cdn.myanimelist.net/images/anime/4/19644.jpg" },
+      { title: "Neon Genesis Evangelion", type: "TV", episodes: 26, year: 1995, poster: "https://cdn.myanimelist.net/images/anime/1314/108941.jpg" },
+      { title: "Spirited Away", type: "Movie", episodes: 1, year: 2001, poster: "https://cdn.myanimelist.net/images/anime/1222/115517.jpg" },
+      { title: "Your Name.", type: "Movie", episodes: 1, year: 2016, poster: "https://cdn.myanimelist.net/images/anime/5/87048.jpg" }
+    ];
+
     function saveToStorage() {
       localStorage.setItem('cyberRankAnimeData', JSON.stringify(animeList));
     }
@@ -750,50 +772,65 @@
       document.getElementById('searchResults').style.display = 'none';
     }
 
-    // Live Anime Search using Jikan API (MyAnimeList)
-    function searchAnimeAPI(query) {
+    // Hybrid Search: Tries online Jikan API first; if it errors or fails, instantly falls back to the offline database seamlessly
+    function searchAnime(query) {
       clearTimeout(searchTimeout);
       const resultsContainer = document.getElementById('searchResults');
       
-      if (!query || query.trim().length < 2) {
+      if (!query || query.trim().length < 1) {
         resultsContainer.style.display = 'none';
         return;
       }
 
       searchTimeout = setTimeout(() => {
         fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`)
-          .then(res => res.json())
+          .then(res => {
+            if (!res.ok) throw new Error("API rate-limited or blocked");
+            return res.json();
+          })
           .then(data => {
             if (data && data.data && data.data.length > 0) {
-              resultsContainer.innerHTML = data.data.map(anime => {
-                const title = anime.title_english || anime.title;
-                const poster = anime.images?.jpg?.image_url || '';
-                const year = anime.year || (anime.aired?.from ? new Date(anime.aired.from).getFullYear() : '?');
-                const eps = anime.episodes || '?';
-                const type = anime.type || 'TV';
-                
-                return `
-                  <div class="search-result-item" onclick="selectSearchedAnime('${encodeURIComponent(title)}', '${poster}', '${eps}', '${year}', '${type}')">
-                    <img src="${poster}" alt="Thumb" onerror="this.src='https://via.placeholder.com/35x50/0a0b14/00f3ff?text=?'">
-                    <div>
-                      <div class="search-result-info">${title}</div>
-                      <div class="search-result-sub">${type} • ${year} • ${eps} EPS</div>
-                    </div>
-                  </div>
-                `;
-              }).join('');
-              resultsContainer.style.display = 'block';
+              displaySearchResults(data.data.map(anime => ({
+                title: anime.title_english || anime.title,
+                poster: anime.images?.jpg?.image_url || '',
+                episodes: anime.episodes || '?',
+                year: anime.year || (anime.aired?.from ? new Date(anime.aired.from).getFullYear() : '?'),
+                type: anime.type || 'TV'
+              })));
             } else {
-              resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ NO MATCH FOUND ]</div>`;
-              resultsContainer.style.display = 'block';
+              triggerOfflineSearch(query);
             }
           })
-          .catch(err => {
-            console.error("Connection error:", err);
-            resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--neon-pink);">[ CONNECTION ERROR / RATE LIMITED ]</div>`;
-            resultsContainer.style.display = 'block';
+          .catch(() => {
+            triggerOfflineSearch(query);
           });
-      }, 400);
+      }, 300);
+    }
+
+    function triggerOfflineSearch(query) {
+      const resultsContainer = document.getElementById('searchResults');
+      const filtered = offlineDatabase.filter(a => a.title.toLowerCase().includes(query.toLowerCase()));
+      
+      if (filtered.length > 0) {
+        displaySearchResults(filtered);
+      } else {
+        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ CUSTOM ENTRY MODE: Type details manually ]</div>`;
+        resultsContainer.style.display = 'block';
+      }
+    }
+
+    function displaySearchResults(items) {
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = items.map(anime => `
+        <div class="search-result-item" onclick="selectSearchedAnime('${encodeURIComponent(anime.title)}', '${anime.poster}', '${anime.episodes}', '${anime.year}', '${anime.type}')">
+          <img src="${anime.poster}" alt="Thumb" onerror="this.src='https://via.placeholder.com/35x50/0a0b14/00f3ff?text=?'">
+          <div>
+            <div class="search-result-info">${anime.title}</div>
+            <div class="search-result-sub">${anime.type} • ${anime.year} • ${anime.episodes} EPS</div>
+          </div>
+        </div>
+      `).join('');
+      resultsContainer.style.display = 'block';
     }
 
     function selectSearchedAnime(title, poster, episodes, year, type) {
