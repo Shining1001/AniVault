@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberRank // Anime Scoring Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #05050a;
+      --bg-card: rgba(13, 14, 26, 0.85);
+      --bg-card-hover: rgba(22, 25, 45, 0.95);
+      --neon-cyan: #00f3ff;
+      --neon-pink: #ff0055;
+      --neon-yellow: #ffe600;
+      --neon-purple: #b026ff;
+      --neon-green: #00ff66;
+      --text-main: #e2e8f0;
+      --text-dim: #718096;
+      --border-glow: rgba(0, 243, 255, 0.3);
+      --font-title: 'Orbitron', sans-serif;
+      --font-body: 'Rajdhani', sans-serif;
+      --font-mono: 'Share Tech Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(176, 38, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(0, 243, 255, 0.1) 0%, transparent 40%),
+        linear-gradient(rgba(5, 5, 10, 0.92), rgba(5, 5, 10, 0.92)),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 243, 255, 0.03) 3px, rgba(0, 243, 255, 0.03) 3px);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 18px;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: rgba(8, 9, 18, 0.9);
+      border-bottom: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-title {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+      text-transform: uppercase;
+    }
+
+    .logo-title span {
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+    }
+
+    .subtitle {
+      font-family: var(--font-mono);
+      color: var(--neon-cyan);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 25px 20px;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.05);
+      padding: 15px 20px;
+      border-radius: 4px;
+      margin-bottom: 25px;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .tab-btn {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-glow);
+      color: var(--text-main);
+      padding: 10px 18px;
+      font-family: var(--font-title);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+
+    .tab-btn:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+      color: var(--neon-cyan);
+    }
+
+    .tab-btn.active {
+      background: var(--neon-cyan);
+      color: #000;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 15px var(--neon-cyan);
+      font-weight: 800;
+    }
+
+    .cyber-btn {
+      background: transparent;
+      border: 1px solid var(--neon-pink);
+      color: var(--neon-pink);
+      font-family: var(--font-title);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    .cyber-btn:hover {
+      background: var(--neon-pink);
+      color: #fff;
+      box-shadow: 0 0 20px var(--neon-pink);
+    }
+
+    .cyber-btn-cyan {
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    .cyber-btn-cyan:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    .leaderboard-view {
+      display: none;
+    }
+
+    .leaderboard-view.active {
+      display: block;
+    }
+
+    .leaderboard-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .anime-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .anime-table th {
+      background: rgba(0, 0, 0, 0.8);
+      font-family: var(--font-title);
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      padding: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid var(--border-glow);
+    }
+
+    .anime-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+
+    .anime-table tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .rank-badge {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      font-weight: 800;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-1 { color: #ffd700; border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+    .rank-2 { color: #c0c0c0; border-color: #c0c0c0; box-shadow: 0 0 10px rgba(192, 192, 192, 0.3); }
+    .rank-3 { color: #cd7f32; border-color: #cd7f32; box-shadow: 0 0 10px rgba(205, 127, 50, 0.3); }
+
+    .poster-img {
+      width: 55px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .anime-title-main {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .anime-meta {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .format-tag {
+      background: rgba(176, 38, 255, 0.2);
+      color: var(--neon-purple);
+      border: 1px solid var(--neon-purple);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .score-display-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .score-pill-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-pill-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-bottom: 2px;
+    }
+
+    .overall-score-pill {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--neon-cyan);
+      background: rgba(0, 243, 255, 0.08);
+      border: 1px solid var(--border-glow);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .personal-score-pill {
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--neon-yellow);
+      background: rgba(255, 230, 0, 0.08);
+      border: 1px solid rgba(255, 230, 0, 0.3);
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-shadow: 0 0 8px rgba(255, 230, 0, 0.3);
+    }
+
+    .category-breakdown {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    .cat-box {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 6px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .cat-label {
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      display: block;
+    }
+
+    .cat-val {
+      color: var(--neon-cyan);
+      font-weight: bold;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .icon-btn.delete:hover {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      background: #0a0b14;
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+      width: 100%;
+      max-width: 650px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 6px;
+      padding: 25px;
+      position: relative;
+    }
+
+    .modal-header {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      color: var(--neon-cyan);
+      border-bottom: 1px solid var(--border-glow);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--neon-pink);
+      font-size: 1.5rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--neon-cyan);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      color: #fff;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--neon-pink);
+      box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+    }
+
+    .mal-results-list {
+      background: rgba(10, 11, 20, 0.98);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 4px;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .mal-results-list.active {
+      display: block;
+    }
+
+    .mal-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: background 0.2s;
+    }
+
+    .mal-item:hover {
+      background: rgba(0, 243, 255, 0.18);
+    }
+
+    .mal-item img {
+      width: 45px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 2px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .mal-item-title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .mal-item-sub {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .search-status {
+      padding: 15px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--neon-yellow);
+    }
+
+    .selected-anime-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(0, 243, 255, 0.05);
+      border: 1px solid var(--neon-cyan);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .selected-anime-card img {
+      width: 55px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 3px;
+    }
+
+    .numeric-score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    .numeric-input-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .numeric-input-box input[type="number"] {
+      font-family: var(--font-title);
+      font-size: 1.1rem;
+      color: var(--neon-yellow);
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .personal-score-box {
+      grid-column: span 2;
+      background: rgba(255, 230, 0, 0.05);
+      border: 1px solid rgba(255, 230, 0, 0.3);
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .personal-score-box label {
+      color: var(--neon-yellow);
+    }
+
+    .backup-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      padding: 20px;
+      border-radius: 4px;
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    @media (max-width: 768px) {
+      .category-breakdown {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .numeric-score-grid {
+        grid-template-columns: 1fr;
+      }
+      .personal-score-box {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-title">CYBER<span>RANK</span></div>
+    <div class="subtitle">// PERSONAL ANIME DATABASE & SCORING PROTOCOL</div>
+  </header>
+
+  <div class="container">
+    <div class="control-panel">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('watchOrder')">1. WATCH ORDER</button>
+        <button class="tab-btn" onclick="switchTab('scoreRank')">2. SCORE RANKING</button>
+      </div>
+      <button class="cyber-btn cyber-btn-cyan" onclick="openAddModal()">+ ADD ANIME</button>
+    </div>
+
+    <!-- Leaderboard 1: Watch Order -->
+    <div id="watchOrderView" class="leaderboard-view active">
+      <div class="leaderboard-card">
+        <table class="anime-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">SEQ</th>
+              <th style="width: 70px;">COVER</th>
+              <th>ANIME DETAILS</th>
+              <th>FORMAT</th>
+              <th style="width: 280px;">CATEGORY BREAKDOWN</th>
+              <th style="text-align: center;">SCORES</th>
+              <th style="text-align: center;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="watchOrderTableBody"></tbody>
+        </table>
+        <div id="watchOrderEmpty" class="empty-state" style="display:none;">
+          [ SYSTEM EMPTY ] No anime added yet. Click "+ ADD ANIME" to add your first watched anime!
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard 2: Score Ranking -->
+    <div id="scoreRankView" class="leaderboard-view">
+      <div class="leaderboard-card">
+        <table class="anime-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">RANK</th>
+              <th style="width: 70px;">COVER</th>
+              <th>ANIME DETAILS</th>
+              <th>FORMAT</th>
+              <th style="width: 280px;">CATEGORY BREAKDOWN</th>
+              <th style="text-align: center;">SCORES</th>
+              <th style="text-align: center;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="scoreRankTableBody"></tbody>
+        </table>
+        <div id="scoreRankEmpty" class="empty-state" style="display:none;">
+          [ SYSTEM EMPTY ] No ranked anime found.
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Management -->
+    <div class="backup-panel">
+      <div>
+        <h4 style="font-family: var(--font-title); color: #fff;">DATA MANAGEMENT</h4>
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">Save backups or restore your list across devices</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="cyber-btn" onclick="exportData()" style="border-color: var(--neon-green); color: var(--neon-green);">EXPORT JSON</button>
+        <button class="cyber-btn" onclick="document.getElementById('importFileInput').click()">IMPORT JSON</button>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importData(event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Anime Modal -->
+  <div class="modal-overlay" id="animeModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <span id="modalTitle">SEARCH & RANK ANIME</span>
+        <button class="close-modal" onclick="closeModal()">✕</button>
+      </div>
+
+      <!-- Step 1: Search Section -->
+      <div id="searchSection" class="form-group">
+        <label>SEARCH ANIME</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="searchInput" placeholder="Type anime title..." autocomplete="off" oninput="handleInstantSearch(this.value)" onkeydown="if(event.key === 'Enter') triggerSearch()">
+          <button class="cyber-btn cyber-btn-cyan" onclick="triggerSearch()" style="padding: 10px 15px;">🔍 SEARCH</button>
+        </div>
+        <div id="searchResultsList" class="mal-results-list"></div>
+      </div>
+
+      <!-- Step 2: Scoring Section -->
+      <form id="scoringForm" style="display: none;" onsubmit="saveAnime(event)">
+        <input type="hidden" id="animeId">
+        
+        <div class="selected-anime-card">
+          <img id="previewPoster" src="" alt="Cover">
+          <div>
+            <h3 id="previewTitle" style="font-family: var(--font-title); color: #fff; font-size: 1.1rem;"></h3>
+            <p id="previewMeta" style="font-family: var(--font-mono); color: var(--text-dim); font-size: 0.85rem; margin-top: 4px;"></p>
+          </div>
+        </div>
+
+        <h4 style="font-family: var(--font-title); color: var(--neon-cyan); margin: 15px 0 10px 0; border-bottom: 1px solid rgba(0,243,255,0.2); padding-bottom: 5px;">
+          YOUR POINT BREAKDOWN (0.0 TO 10.0)
+        </h4>
+
+        <div class="numeric-score-grid">
+          <div class="numeric-input-box">
+            <label>CHARACTERS</label>
+            <input type="number" id="scoreCharacters" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+
+          <div class="numeric-input-box">
+            <label>STORY</label>
+            <input type="number" id="scoreStory" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+
+          <div class="numeric-input-box">
+            <label>EMOTIONAL IMPACT</label>
+            <input type="number" id="scoreEmotion" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+
+          <div class="numeric-input-box">
+            <label>ENDING</label>
+            <input type="number" id="scoreEnding" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+
+          <div class="numeric-input-box" style="grid-column: span 2;">
+            <label>REWATCHABILITY</label>
+            <input type="number" id="scoreRewatch" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+
+          <div class="numeric-input-box personal-score-box">
+            <label>★ PERSONAL SCORE (USED FOR LEADERBOARD RANKING)</label>
+            <input type="number" id="scorePersonal" min="0" max="10" step="0.1" value="8.0" required>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="cyber-btn" onclick="resetToSearch()" style="width: 35%;">CHANGE ANIME</button>
+          <button type="submit" class="cyber-btn cyber-btn-cyan" style="width: 65%;">CONFIRM & SAVE RANK</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let animeList = JSON.parse(localStorage.getItem('cyberRankAnimeData')) || [];
+    let selectedAnimeMeta = null;
+    let searchTimeout = null;
+
+    function saveToStorage() {
+      localStorage.setItem('cyberRankAnimeData', JSON.stringify(animeList));
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.leaderboard-view').forEach(view => view.classList.remove('active'));
+
+      if (tab === 'watchOrder') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('watchOrderView').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('scoreRankView').classList.add('active');
+      }
+      renderTables();
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').innerText = "SEARCH & RANK ANIME";
+      document.getElementById('animeId').value = "";
+      document.getElementById('searchInput').value = "";
+      document.getElementById('searchResultsList').classList.remove('active');
+      
+      document.getElementById('searchSection').style.display = 'block';
+      document.getElementById('scoringForm').style.display = 'none';
+      selectedAnimeMeta = null;
+
+      document.getElementById('animeModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('animeModal').classList.remove('active');
+    }
+
+    function resetToSearch() {
+      document.getElementById('searchSection').style.display = 'block';
+      document.getElementById('scoringForm').style.display = 'none';
+      selectedAnimeMeta = null;
+    }
+
+    function handleInstantSearch(query) {
+      clearTimeout(searchTimeout);
+      if (!query || query.trim().length < 2) {
+        document.getElementById('searchResultsList').classList.remove('active');
+        return;
+      }
+      searchTimeout = setTimeout(() => {
+        executeAniListSearch(query);
+      }, 250);
+    }
+
+    function triggerSearch() {
+      clearTimeout(searchTimeout);
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) executeAniListSearch(query);
+    }
+
+    async function executeAniListSearch(query) {
+      const resultsBox = document.getElementById('searchResultsList');
+      resultsBox.innerHTML = '<div class="search-status">SEARCHING PROTOCOL...</div>';
+      resultsBox.classList.add('active');
+
+      const aniGraphQuery = `
+        query ($search: String) {
+          Page(perPage: 12) {
+            media(search: $search, type: ANIME) {
+              id
+              title { english romaji native }
+              coverImage { large }
+              format
+              episodes
+              startDate { year }
+            }
+          }
+        }
+      `;
+
+      try {
+        const res = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: aniGraphQuery,
+            variables: { search: query }
+          })
+        });
+
+        const data = await res.json();
+        const items = data.data?.Page?.media;
+
+        if (items && items.length > 0) {
+          renderSearchResults(items);
+        } else {
+          resultsBox.innerHTML = '<div class="search-status">NO ANIME FOUND. TRY ANOTHER TITLE.</div>';
+        }
+      } catch (err) {
+        resultsBox.innerHTML = '<div class="search-status" style="color: var(--neon-pink);">CONNECTION ERROR. PLEASE TRY AGAIN.</div>';
+      }
+    }
+
+    function renderSearchResults(results) {
+      const resultsBox = document.getElementById('searchResultsList');
+      resultsBox.innerHTML = results.map(anime => {
+        const title = anime.title.english || anime.title.romaji || anime.title.native;
+        const year = anime.startDate?.year || '?';
+        const format = (anime.format || 'TV').replace(/_/g, ' ');
+        const epStr = anime.episodes ? `${anime.episodes} EPS` : '? EPS';
+        
+        const mappedAnime = {
+          title: title,
+          poster: anime.coverImage?.large || '',
+          format: format,
+          year: year,
+          episodes: anime.episodes ? anime.episodes : '?'
+        };
+
+        return `
+          <div class="mal-item" onclick="selectAnimeForScoring(${JSON.stringify(mappedAnime).replace(/"/g, '&quot;')})">
+            <img src="${mappedAnime.poster}" alt="Cover">
+            <div>
+              <div class="mal-item-title">${title}</div>
+              <div class="mal-item-sub">${format} • ${year} • ${epStr}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectAnimeForScoring(anime) {
+      selectedAnimeMeta = anime;
+
+      document.getElementById('previewPoster').src = selectedAnimeMeta.poster;
+      document.getElementById('previewTitle').innerText = selectedAnimeMeta.title;
+      document.getElementById('previewMeta').innerText = `${selectedAnimeMeta.format} • ${selectedAnimeMeta.year} • ${selectedAnimeMeta.episodes} EPS`;
+
+      document.getElementById('scoreCharacters').value = "8.0";
+      document.getElementById('scoreStory').value = "8.0";
+      document.getElementById('scoreEmotion').value = "8.0";
+      document.getElementById('scoreEnding').value = "8.0";
+      document.getElementById('scoreRewatch').value = "8.0";
+      document.getElementById('scorePersonal').value = "8.0";
+
+      document.getElementById('searchSection').style.display = 'none';
+      document.getElementById('scoringForm').style.display = 'block';
+    }
+
+    function calculateOverall(scores) {
+      const sum = scores.characters + scores.story + scores.emotion + scores.ending + scores.rewatch;
+      return (sum / 5).toFixed(1);
+    }
+
+    function saveAnime(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById('animeId').value;
+      const scores = {
+        characters: parseFloat(document.getElementById('scoreCharacters').value) || 0,
+        story: parseFloat(document.getElementById('scoreStory').value) || 0,
+        emotion: parseFloat(document.getElementById('scoreEmotion').value) || 0,
+        ending: parseFloat(document.getElementById('scoreEnding').value) || 0,
+        rewatch: parseFloat(document.getElementById('scoreRewatch').value) || 0
+      };
+
+      const personalScore = parseFloat(document.getElementById('scorePersonal').value) || 0;
+      const overall = parseFloat(calculateOverall(scores));
+
+      if (id) {
+        const idx = animeList.findIndex(a => a.id === id);
+        if (idx !== -1) {
+          animeList[idx].scores = scores;
+          animeList[idx].personalScore = personalScore;
+          animeList[idx].overall = overall;
+          if (selectedAnimeMeta) {
+            animeList[idx].title = selectedAnimeMeta.title;
+            animeList[idx].poster = selectedAnimeMeta.poster;
+            animeList[idx].format = selectedAnimeMeta.format;
+            animeList[idx].episodes = selectedAnimeMeta.episodes;
+            animeList[idx].year = selectedAnimeMeta.year;
+          }
+        }
+      } else {
+        if (!selectedAnimeMeta) return;
+        const newAnime = {
+          id: Date.now().toString(),
+          watchOrder: animeList.length + 1,
+          title: selectedAnimeMeta.title,
+          format: selectedAnimeMeta.format,
+          poster: selectedAnimeMeta.poster,
+          episodes: selectedAnimeMeta.episodes,
+          year: selectedAnimeMeta.year,
+          scores: scores,
+          personalScore: personalScore,
+          overall: overall
+        };
+        animeList.push(newAnime);
+      }
+
+      saveToStorage();
+      closeModal();
+      renderTables();
+    }
+
+    function deleteAnime(id) {
+      if (confirm("Are you sure you want to delete this anime ranking?")) {
+        animeList = animeList.filter(a => a.id !== id);
+        animeList.forEach((item, index) => {
+          item.watchOrder = index + 1;
+        });
+        saveToStorage();
+        renderTables();
+      }
+    }
+
+    function moveOrder(id, direction) {
+      const idx = animeList.findIndex(a => a.id === id);
+      if (idx === -1) return;
+
+      if (direction === 'up' && idx > 0) {
+        const temp = animeList[idx];
+        animeList[idx] = animeList[idx - 1];
+        animeList[idx - 1] = temp;
+      } else if (direction === 'down' && idx < animeList.length - 1) {
+        const temp = animeList[idx];
+        animeList[idx] = animeList[idx + 1];
+        animeList[idx + 1] = temp;
+      }
+
+      animeList.forEach((item, index) => {
+        item.watchOrder = index + 1;
+      });
+
+      saveToStorage();
+      renderTables();
+    }
+
+    function editAnime(id) {
+      const anime = animeList.find(a => a.id === id);
+      if (!anime) return;
+
+      document.getElementById('modalTitle').innerText = "EDIT ANIME RANKING";
+      document.getElementById('animeId').value = anime.id;
+
+      selectedAnimeMeta = {
+        title: anime.title,
+        poster: anime.poster,
+        format: anime.format,
+        episodes: anime.episodes,
+        year: anime.year
+      };
+
+      document.getElementById('previewPoster').src = anime.poster;
+      document.getElementById('previewTitle').innerText = anime.title;
+      document.getElementById('previewMeta').innerText = `${anime.format} • ${anime.year} • ${anime.episodes} EPS`;
+
+      document.getElementById('scoreCharacters').value = anime.scores.characters.toFixed(1);
+      document.getElementById('scoreStory').value = anime.scores.story.toFixed(1);
+      document.getElementById('scoreEmotion').value = anime.scores.emotion.toFixed(1);
+      document.getElementById('scoreEnding').value = anime.scores.ending.toFixed(1);
+      document.getElementById('scoreRewatch').value = anime.scores.rewatch.toFixed(1);
+      document.getElementById('scorePersonal').value = (anime.personalScore !== undefined ? anime.personalScore : anime.overall).toFixed(1);
+
+      document.getElementById('searchSection').style.display = 'none';
+      document.getElementById('scoringForm').style.display = 'block';
+
+      document.getElementById('animeModal').classList.add('active');
+    }
+
+    function createRowHTML(anime, displayRank, isWatchOrder) {
+      const pScore = anime.personalScore !== undefined ? anime.personalScore.toFixed(1) : anime.overall.toFixed(1);
+      const cScore = anime.overall.toFixed(1);
+
+      return `
+        <tr>
+          <td>
+            <div class="rank-badge ${displayRank === 1 ? 'rank-1' : displayRank === 2 ? 'rank-2' : displayRank === 3 ? 'rank-3' : ''}">
+              #${displayRank}
+            </div>
+          </td>
+          <td>
+            <img src="${anime.poster}" class="poster-img" alt="Cover" onerror="this.src='https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER'">
+          </td>
+          <td>
+            <span class="anime-title-main">${anime.title}</span>
+            <span class="anime-meta">${anime.year} • ${anime.episodes} EPS</span>
+          </td>
+          <td>
+            <span class="format-tag">${anime.format || 'TV'}</span>
+          </td>
+          <td>
+            <div class="category-breakdown">
+              <div class="cat-box"><span class="cat-label">CHAR</span><span class="cat-val">${anime.scores.characters.toFixed(1)}</span></div>
+              <div class="cat-box"><span class="cat-label">STORY</span><span class="cat-val">${anime.scores.story.toFixed(1)}</span></div>
+              <div class="cat-box"><span class="cat-label">EMOT</span><span class="cat-val">${anime.scores.emotion.toFixed(1)}</span></div>
+              <div class="cat-box"><span class="cat-label">END</span><span class="cat-val">${anime.scores.ending.toFixed(1)}</span></div>
+              <div class="cat-box"><span class="cat-label">REW</span><span class="cat-val">${anime.scores.rewatch.toFixed(1)}</span></div>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <div class="score-display-group">
+              <div class="score-pill-container">
+                <span class="score-pill-tag">CALC</span>
+                <span class="overall-score-pill">${cScore}</span>
+              </div>
+              <div class="score-pill-container">
+                <span class="score-pill-tag">PERSONAL</span>
+                <span class="personal-score-pill">${pScore}</span>
+              </div>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <div class="action-btns" style="justify-content: center;">
+              ${isWatchOrder ? `
+                <button class="icon-btn" onclick="moveOrder('${anime.id}', 'up')" title="Move Up">▲</button>
+                <button class="icon-btn" onclick="moveOrder('${anime.id}', 'down')" title="Move Down">▼</button>
+              ` : ''}
+              <button class="icon-btn" onclick="editAnime('${anime.id}')" title="Edit">✏️</button>
+              <button class="icon-btn delete" onclick="deleteAnime('${anime.id}')" title="Delete">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderTables() {
+      const watchOrderTbody = document.getElementById('watchOrderTableBody');
+      const watchEmpty = document.getElementById('watchOrderEmpty');
+      
+      if (animeList.length === 0) {
+        watchOrderTbody.innerHTML = '';
+        watchEmpty.style.display = 'block';
+      } else {
+        watchEmpty.style.display = 'none';
+        watchOrderTbody.innerHTML = animeList.map((anime, index) => createRowHTML(anime, index + 1, true)).join('');
+      }
+
+      const scoreRankTbody = document.getElementById('scoreRankTableBody');
+      const scoreEmpty = document.getElementById('scoreRankEmpty');
+
+      if (animeList.length === 0) {
+        scoreRankTbody.innerHTML = '';
+        scoreEmpty.style.display = 'block';
+      } else {
+        scoreEmpty.style.display = 'none';
+        // Sort descending by personalScore (falling back to overall score if personalScore is missing)
+        const sortedList = [...animeList].sort((a, b) => {
+          const scoreA = a.personalScore !== undefined ? a.personalScore : a.overall;
+          const scoreB = b.personalScore !== undefined ? b.personalScore : b.overall;
+          return scoreB - scoreA;
+        });
+        scoreRankTbody.innerHTML = sortedList.map((anime, index) => createRowHTML(anime, index + 1, false)).join('');
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(animeList, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `cyberrank_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            animeList = imported;
+            saveToStorage();
+            renderTables();
+            alert("Database successfully restored!");
+          } else {
+            alert("Invalid data format!");
+          }
+        } catch (err) {
+          alert("Error parsing JSON file!");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    renderTables();
+  </script>
+</body>
+</html>
