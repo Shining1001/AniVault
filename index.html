@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg-base: #05050a;
@@ -45,6 +46,7 @@
       padding-bottom: 60px;
     }
 
+    /* Cyber Header */
     header {
       background: rgba(8, 9, 18, 0.9);
       border-bottom: 2px solid var(--neon-cyan);
@@ -87,6 +89,7 @@
       padding: 25px 20px;
     }
 
+    /* Control Bar */
     .control-panel {
       display: flex;
       flex-wrap: wrap;
@@ -167,6 +170,7 @@
       box-shadow: 0 0 20px var(--neon-cyan);
     }
 
+    /* Leaderboard Tables */
     .leaderboard-view {
       display: none;
     }
@@ -262,47 +266,12 @@
       font-weight: bold;
     }
 
-    .score-display-group {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .score-pill-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .score-pill-tag {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-bottom: 2px;
-    }
-
     .overall-score-pill {
       font-family: var(--font-title);
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--neon-cyan);
-      background: rgba(0, 243, 255, 0.08);
-      border: 1px solid var(--border-glow);
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
-
-    .personal-score-pill {
-      font-family: var(--font-title);
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 900;
       color: var(--neon-yellow);
-      background: rgba(255, 230, 0, 0.08);
-      border: 1px solid rgba(255, 230, 0, 0.3);
-      padding: 4px 10px;
-      border-radius: 4px;
-      text-shadow: 0 0 8px rgba(255, 230, 0, 0.3);
+      text-shadow: 0 0 10px rgba(255, 230, 0, 0.4);
     }
 
     .category-breakdown {
@@ -363,6 +332,7 @@
       box-shadow: 0 0 8px var(--neon-pink);
     }
 
+    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -418,7 +388,12 @@
 
     .form-group {
       margin-bottom: 15px;
-      position: relative;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
     }
 
     label {
@@ -430,137 +405,49 @@
       text-transform: uppercase;
     }
 
-    .search-input-wrapper {
-      display: flex;
-      gap: 10px;
-    }
-
-    input {
+    input, select, textarea {
       width: 100%;
       background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(0, 243, 255, 0.3);
       color: #fff;
-      padding: 12px;
-      border-radius: 4px;
-      font-family: var(--font-body);
-      font-size: 1.05rem;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--neon-pink);
-      box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
-    }
-
-    .mal-results-list {
-      background: rgba(10, 11, 20, 0.98);
-      border: 1px solid var(--neon-cyan);
-      border-radius: 4px;
-      max-height: 280px;
-      overflow-y: auto;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .mal-results-list.active {
-      display: block;
-    }
-
-    .mal-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      transition: background 0.2s;
-    }
-
-    .mal-item:hover {
-      background: rgba(0, 243, 255, 0.18);
-    }
-
-    .mal-item img {
-      width: 45px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 2px;
-      border: 1px solid var(--border-glow);
-    }
-
-    .mal-item-title {
-      font-family: var(--font-title);
-      font-size: 0.95rem;
-      color: #fff;
-    }
-
-    .mal-item-sub {
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      color: var(--text-dim);
-    }
-
-    .search-status {
-      padding: 15px;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.9rem;
-      color: var(--neon-yellow);
-    }
-
-    .selected-anime-card {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      background: rgba(0, 243, 255, 0.05);
-      border: 1px solid var(--neon-cyan);
-      padding: 12px;
-      border-radius: 4px;
-      margin-bottom: 20px;
-    }
-
-    .selected-anime-card img {
-      width: 55px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 3px;
-    }
-
-    .numeric-score-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      border-radius: 4px;
-    }
-
-    .numeric-input-box {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .numeric-input-box input[type="number"] {
-      font-family: var(--font-title);
-      font-size: 1.1rem;
-      color: var(--neon-yellow);
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .personal-score-box {
-      grid-column: span 2;
-      background: rgba(255, 230, 0, 0.05);
-      border: 1px solid rgba(255, 230, 0, 0.3);
       padding: 10px;
       border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 1rem;
     }
 
-    .personal-score-box label {
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--neon-pink);
+      box-shadow: 0 0 10px rgba(ff, 0, 85, 0.4);
+    }
+
+    .score-slider-group {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .score-label-val {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-title);
+      font-size: 0.9rem;
+    }
+
+    .score-val-num {
       color: var(--neon-yellow);
+      font-weight: bold;
     }
 
+    input[type="range"] {
+      accent-color: var(--neon-cyan);
+      cursor: pointer;
+    }
+
+    /* Backup Section */
     .backup-panel {
       background: var(--bg-card);
       border: 1px solid var(--border-glow);
@@ -585,11 +472,8 @@
       .category-breakdown {
         grid-template-columns: repeat(2, 1fr);
       }
-      .numeric-score-grid {
+      .form-row {
         grid-template-columns: 1fr;
-      }
-      .personal-score-box {
-        grid-column: span 1;
       }
     }
   </style>
@@ -602,6 +486,7 @@
   </header>
 
   <div class="container">
+    <!-- Navigation & Action Controls -->
     <div class="control-panel">
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('watchOrder')">1. WATCH ORDER</button>
@@ -621,11 +506,13 @@
               <th>ANIME DETAILS</th>
               <th>FORMAT</th>
               <th style="width: 280px;">CATEGORY BREAKDOWN</th>
-              <th style="text-align: center;">SCORES</th>
+              <th style="text-align: center;">OVERALL</th>
               <th style="text-align: center;">ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="watchOrderTableBody"></tbody>
+          <tbody id="watchOrderTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
         </table>
         <div id="watchOrderEmpty" class="empty-state" style="display:none;">
           [ SYSTEM EMPTY ] No anime added yet. Click "+ ADD ANIME" to add your first watched anime!
@@ -644,11 +531,13 @@
               <th>ANIME DETAILS</th>
               <th>FORMAT</th>
               <th style="width: 280px;">CATEGORY BREAKDOWN</th>
-              <th style="text-align: center;">SCORES</th>
+              <th style="text-align: center;">OVERALL</th>
               <th style="text-align: center;">ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="scoreRankTableBody"></tbody>
+          <tbody id="scoreRankTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
         </table>
         <div id="scoreRankEmpty" class="empty-state" style="display:none;">
           [ SYSTEM EMPTY ] No ranked anime found.
@@ -656,7 +545,7 @@
       </div>
     </div>
 
-    <!-- Data Management -->
+    <!-- Data Backup & Restore -->
     <div class="backup-panel">
       <div>
         <h4 style="font-family: var(--font-title); color: #fff;">DATA MANAGEMENT</h4>
@@ -674,71 +563,94 @@
   <div class="modal-overlay" id="animeModal">
     <div class="modal-container">
       <div class="modal-header">
-        <span id="modalTitle">SEARCH & RANK ANIME</span>
+        <span id="modalTitle">MANUAL ANIME ENTRY</span>
         <button class="close-modal" onclick="closeModal()">✕</button>
       </div>
 
-      <!-- Step 1: Search Section -->
-      <div id="searchSection" class="form-group">
-        <label>SEARCH ANIME</label>
-        <div class="search-input-wrapper">
-          <input type="text" id="searchInput" placeholder="Type anime title..." autocomplete="off" oninput="handleInstantSearch(this.value)" onkeydown="if(event.key === 'Enter') triggerSearch()">
-          <button class="cyber-btn cyber-btn-cyan" onclick="triggerSearch()" style="padding: 10px 15px;">🔍 SEARCH</button>
-        </div>
-        <div id="searchResultsList" class="mal-results-list"></div>
-      </div>
-
-      <!-- Step 2: Scoring Section -->
-      <form id="scoringForm" style="display: none;" onsubmit="saveAnime(event)">
+      <form id="animeForm" onsubmit="saveAnime(event)">
         <input type="hidden" id="animeId">
-        
-        <div class="selected-anime-card">
-          <img id="previewPoster" src="" alt="Cover">
-          <div>
-            <h3 id="previewTitle" style="font-family: var(--font-title); color: #fff; font-size: 1.1rem;"></h3>
-            <p id="previewMeta" style="font-family: var(--font-mono); color: var(--text-dim); font-size: 0.85rem; margin-top: 4px;"></p>
+
+        <div class="form-group">
+          <label>Anime Title *</label>
+          <input type="text" id="animeTitle" required placeholder="e.g. Cyberpunk: Edgerunners">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Format / Type</label>
+            <select id="animeFormat">
+              <option value="TV">TV Series</option>
+              <option value="OVA">OVA</option>
+              <option value="Movie">Movie</option>
+              <option value="Special">Special</option>
+              <option value="ONA">ONA</option>
+              <option value="Music">Music</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Poster Image URL</label>
+            <input type="url" id="animePoster" placeholder="https://image-link.jpg">
           </div>
         </div>
 
-        <h4 style="font-family: var(--font-title); color: var(--neon-cyan); margin: 15px 0 10px 0; border-bottom: 1px solid rgba(0,243,255,0.2); padding-bottom: 5px;">
-          YOUR POINT BREAKDOWN (0.0 TO 10.0)
+        <div class="form-row">
+          <div class="form-group">
+            <label>Episodes</label>
+            <input type="number" id="animeEpisodes" placeholder="12" min="1">
+          </div>
+          <div class="form-group">
+            <label>Release Year</label>
+            <input type="number" id="animeYear" placeholder="2022" min="1950" max="2030">
+          </div>
+        </div>
+
+        <h4 style="font-family: var(--font-title); color: var(--neon-cyan); margin: 20px 0 10px 0; border-bottom: 1px solid rgba(0,243,255,0.2); padding-bottom: 5px;">
+          POINT BREAKDOWN (0.0 - 10.0)
         </h4>
 
-        <div class="numeric-score-grid">
-          <div class="numeric-input-box">
-            <label>CHARACTERS</label>
-            <input type="number" id="scoreCharacters" min="0" max="10" step="0.1" value="8.0" required>
+        <!-- Category Sliders -->
+        <div class="score-slider-group">
+          <div class="score-label-val">
+            <span>CHARACTERS</span>
+            <span class="score-val-num" id="valCharacters">8.0</span>
           </div>
-
-          <div class="numeric-input-box">
-            <label>STORY</label>
-            <input type="number" id="scoreStory" min="0" max="10" step="0.1" value="8.0" required>
-          </div>
-
-          <div class="numeric-input-box">
-            <label>EMOTIONAL IMPACT</label>
-            <input type="number" id="scoreEmotion" min="0" max="10" step="0.1" value="8.0" required>
-          </div>
-
-          <div class="numeric-input-box">
-            <label>ENDING</label>
-            <input type="number" id="scoreEnding" min="0" max="10" step="0.1" value="8.0" required>
-          </div>
-
-          <div class="numeric-input-box" style="grid-column: span 2;">
-            <label>REWATCHABILITY</label>
-            <input type="number" id="scoreRewatch" min="0" max="10" step="0.1" value="8.0" required>
-          </div>
-
-          <div class="numeric-input-box personal-score-box">
-            <label>★ PERSONAL SCORE (USED FOR LEADERBOARD RANKING)</label>
-            <input type="number" id="scorePersonal" min="0" max="10" step="0.1" value="8.0" required>
-          </div>
+          <input type="range" id="scoreCharacters" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Characters', this.value)">
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="button" class="cyber-btn" onclick="resetToSearch()" style="width: 35%;">CHANGE ANIME</button>
-          <button type="submit" class="cyber-btn cyber-btn-cyan" style="width: 65%;">CONFIRM & SAVE RANK</button>
+        <div class="score-slider-group">
+          <div class="score-label-val">
+            <span>STORY</span>
+            <span class="score-val-num" id="valStory">8.0</span>
+          </div>
+          <input type="range" id="scoreStory" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Story', this.value)">
+        </div>
+
+        <div class="score-slider-group">
+          <div class="score-label-val">
+            <span>EMOTIONAL IMPACT</span>
+            <span class="score-val-num" id="valEmotion">8.0</span>
+          </div>
+          <input type="range" id="scoreEmotion" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Emotion', this.value)">
+        </div>
+
+        <div class="score-slider-group">
+          <div class="score-label-val">
+            <span>ENDING</span>
+            <span class="score-val-num" id="valEnding">8.0</span>
+          </div>
+          <input type="range" id="scoreEnding" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Ending', this.value)">
+        </div>
+
+        <div class="score-slider-group">
+          <div class="score-label-val">
+            <span>REWATCHABILITY</span>
+            <span class="score-val-num" id="valRewatch">8.0</span>
+          </div>
+          <input type="range" id="scoreRewatch" min="0" max="10" step="0.1" value="8.0" oninput="updateScoreVal('Rewatch', this.value)">
+        </div>
+
+        <div style="text-align: right; margin-top: 20px;">
+          <button type="submit" class="cyber-btn cyber-btn-cyan" style="width: 100%;">SAVE RANKING</button>
         </div>
       </form>
     </div>
@@ -746,8 +658,6 @@
 
   <script>
     let animeList = JSON.parse(localStorage.getItem('cyberRankAnimeData')) || [];
-    let selectedAnimeMeta = null;
-    let searchTimeout = null;
 
     function saveToStorage() {
       localStorage.setItem('cyberRankAnimeData', JSON.stringify(animeList));
@@ -767,133 +677,24 @@
       renderTables();
     }
 
+    function updateScoreVal(cat, val) {
+      document.getElementById('val' + cat).innerText = parseFloat(val).toFixed(1);
+    }
+
     function openAddModal() {
-      document.getElementById('modalTitle').innerText = "SEARCH & RANK ANIME";
+      document.getElementById('modalTitle').innerText = "MANUAL ANIME ENTRY";
       document.getElementById('animeId').value = "";
-      document.getElementById('searchInput').value = "";
-      document.getElementById('searchResultsList').classList.remove('active');
+      document.getElementById('animeForm').reset();
       
-      document.getElementById('searchSection').style.display = 'block';
-      document.getElementById('scoringForm').style.display = 'none';
-      selectedAnimeMeta = null;
+      ['Characters', 'Story', 'Emotion', 'Ending', 'Rewatch'].forEach(cat => {
+        updateScoreVal(cat, 8.0);
+      });
 
       document.getElementById('animeModal').classList.add('active');
     }
 
     function closeModal() {
       document.getElementById('animeModal').classList.remove('active');
-    }
-
-    function resetToSearch() {
-      document.getElementById('searchSection').style.display = 'block';
-      document.getElementById('scoringForm').style.display = 'none';
-      selectedAnimeMeta = null;
-    }
-
-    function handleInstantSearch(query) {
-      clearTimeout(searchTimeout);
-      if (!query || query.trim().length < 2) {
-        document.getElementById('searchResultsList').classList.remove('active');
-        return;
-      }
-      searchTimeout = setTimeout(() => {
-        executeAniListSearch(query);
-      }, 250);
-    }
-
-    function triggerSearch() {
-      clearTimeout(searchTimeout);
-      const query = document.getElementById('searchInput').value.trim();
-      if (query) executeAniListSearch(query);
-    }
-
-    async function executeAniListSearch(query) {
-      const resultsBox = document.getElementById('searchResultsList');
-      resultsBox.innerHTML = '<div class="search-status">SEARCHING PROTOCOL...</div>';
-      resultsBox.classList.add('active');
-
-      const aniGraphQuery = `
-        query ($search: String) {
-          Page(perPage: 12) {
-            media(search: $search, type: ANIME) {
-              id
-              title { english romaji native }
-              coverImage { large }
-              format
-              episodes
-              startDate { year }
-            }
-          }
-        }
-      `;
-
-      try {
-        const res = await fetch('https://graphql.anilist.co', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: aniGraphQuery,
-            variables: { search: query }
-          })
-        });
-
-        const data = await res.json();
-        const items = data.data?.Page?.media;
-
-        if (items && items.length > 0) {
-          renderSearchResults(items);
-        } else {
-          resultsBox.innerHTML = '<div class="search-status">NO ANIME FOUND. TRY ANOTHER TITLE.</div>';
-        }
-      } catch (err) {
-        resultsBox.innerHTML = '<div class="search-status" style="color: var(--neon-pink);">CONNECTION ERROR. PLEASE TRY AGAIN.</div>';
-      }
-    }
-
-    function renderSearchResults(results) {
-      const resultsBox = document.getElementById('searchResultsList');
-      resultsBox.innerHTML = results.map(anime => {
-        const title = anime.title.english || anime.title.romaji || anime.title.native;
-        const year = anime.startDate?.year || '?';
-        const format = (anime.format || 'TV').replace(/_/g, ' ');
-        const epStr = anime.episodes ? `${anime.episodes} EPS` : '? EPS';
-        
-        const mappedAnime = {
-          title: title,
-          poster: anime.coverImage?.large || '',
-          format: format,
-          year: year,
-          episodes: anime.episodes ? anime.episodes : '?'
-        };
-
-        return `
-          <div class="mal-item" onclick="selectAnimeForScoring(${JSON.stringify(mappedAnime).replace(/"/g, '&quot;')})">
-            <img src="${mappedAnime.poster}" alt="Cover">
-            <div>
-              <div class="mal-item-title">${title}</div>
-              <div class="mal-item-sub">${format} • ${year} • ${epStr}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function selectAnimeForScoring(anime) {
-      selectedAnimeMeta = anime;
-
-      document.getElementById('previewPoster').src = selectedAnimeMeta.poster;
-      document.getElementById('previewTitle').innerText = selectedAnimeMeta.title;
-      document.getElementById('previewMeta').innerText = `${selectedAnimeMeta.format} • ${selectedAnimeMeta.year} • ${selectedAnimeMeta.episodes} EPS`;
-
-      document.getElementById('scoreCharacters').value = "8.0";
-      document.getElementById('scoreStory').value = "8.0";
-      document.getElementById('scoreEmotion').value = "8.0";
-      document.getElementById('scoreEnding').value = "8.0";
-      document.getElementById('scoreRewatch').value = "8.0";
-      document.getElementById('scorePersonal').value = "8.0";
-
-      document.getElementById('searchSection').style.display = 'none';
-      document.getElementById('scoringForm').style.display = 'block';
     }
 
     function calculateOverall(scores) {
@@ -905,44 +706,40 @@
       e.preventDefault();
       
       const id = document.getElementById('animeId').value;
+      const title = document.getElementById('animeTitle').value;
+      const format = document.getElementById('animeFormat').value;
+      const poster = document.getElementById('animePoster').value || 'https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER';
+      const episodes = document.getElementById('animeEpisodes').value || '?';
+      const year = document.getElementById('animeYear').value || '?';
+
       const scores = {
-        characters: parseFloat(document.getElementById('scoreCharacters').value) || 0,
-        story: parseFloat(document.getElementById('scoreStory').value) || 0,
-        emotion: parseFloat(document.getElementById('scoreEmotion').value) || 0,
-        ending: parseFloat(document.getElementById('scoreEnding').value) || 0,
-        rewatch: parseFloat(document.getElementById('scoreRewatch').value) || 0
+        characters: parseFloat(document.getElementById('scoreCharacters').value),
+        story: parseFloat(document.getElementById('scoreStory').value),
+        emotion: parseFloat(document.getElementById('scoreEmotion').value),
+        ending: parseFloat(document.getElementById('scoreEnding').value),
+        rewatch: parseFloat(document.getElementById('scoreRewatch').value)
       };
 
-      const personalScore = parseFloat(document.getElementById('scorePersonal').value) || 0;
       const overall = parseFloat(calculateOverall(scores));
 
       if (id) {
+        // Edit existing
         const idx = animeList.findIndex(a => a.id === id);
         if (idx !== -1) {
-          animeList[idx].scores = scores;
-          animeList[idx].personalScore = personalScore;
-          animeList[idx].overall = overall;
-          if (selectedAnimeMeta) {
-            animeList[idx].title = selectedAnimeMeta.title;
-            animeList[idx].poster = selectedAnimeMeta.poster;
-            animeList[idx].format = selectedAnimeMeta.format;
-            animeList[idx].episodes = selectedAnimeMeta.episodes;
-            animeList[idx].year = selectedAnimeMeta.year;
-          }
+          animeList[idx] = { ...animeList[idx], title, format, poster, episodes, year, scores, overall };
         }
       } else {
-        if (!selectedAnimeMeta) return;
+        // Add new (append to end for watch order)
         const newAnime = {
           id: Date.now().toString(),
           watchOrder: animeList.length + 1,
-          title: selectedAnimeMeta.title,
-          format: selectedAnimeMeta.format,
-          poster: selectedAnimeMeta.poster,
-          episodes: selectedAnimeMeta.episodes,
-          year: selectedAnimeMeta.year,
-          scores: scores,
-          personalScore: personalScore,
-          overall: overall
+          title,
+          format,
+          poster,
+          episodes,
+          year,
+          scores,
+          overall
         };
         animeList.push(newAnime);
       }
@@ -955,6 +752,7 @@
     function deleteAnime(id) {
       if (confirm("Are you sure you want to delete this anime ranking?")) {
         animeList = animeList.filter(a => a.id !== id);
+        // Re-index watch order sequence
         animeList.forEach((item, index) => {
           item.watchOrder = index + 1;
         });
@@ -977,6 +775,7 @@
         animeList[idx + 1] = temp;
       }
 
+      // Re-assign explicit sequence numbers
       animeList.forEach((item, index) => {
         item.watchOrder = index + 1;
       });
@@ -991,36 +790,31 @@
 
       document.getElementById('modalTitle').innerText = "EDIT ANIME RANKING";
       document.getElementById('animeId').value = anime.id;
+      document.getElementById('animeTitle').value = anime.title;
+      document.getElementById('animeFormat').value = anime.format || 'TV';
+      document.getElementById('animePoster').value = anime.poster.includes('placeholder') ? '' : anime.poster;
+      document.getElementById('animeEpisodes').value = anime.episodes === '?' ? '' : anime.episodes;
+      document.getElementById('animeYear').value = anime.year === '?' ? '' : anime.year;
 
-      selectedAnimeMeta = {
-        title: anime.title,
-        poster: anime.poster,
-        format: anime.format,
-        episodes: anime.episodes,
-        year: anime.year
-      };
+      document.getElementById('scoreCharacters').value = anime.scores.characters;
+      updateScoreVal('Characters', anime.scores.characters);
 
-      document.getElementById('previewPoster').src = anime.poster;
-      document.getElementById('previewTitle').innerText = anime.title;
-      document.getElementById('previewMeta').innerText = `${anime.format} • ${anime.year} • ${anime.episodes} EPS`;
+      document.getElementById('scoreStory').value = anime.scores.story;
+      updateScoreVal('Story', anime.scores.story);
 
-      document.getElementById('scoreCharacters').value = anime.scores.characters.toFixed(1);
-      document.getElementById('scoreStory').value = anime.scores.story.toFixed(1);
-      document.getElementById('scoreEmotion').value = anime.scores.emotion.toFixed(1);
-      document.getElementById('scoreEnding').value = anime.scores.ending.toFixed(1);
-      document.getElementById('scoreRewatch').value = anime.scores.rewatch.toFixed(1);
-      document.getElementById('scorePersonal').value = (anime.personalScore !== undefined ? anime.personalScore : anime.overall).toFixed(1);
+      document.getElementById('scoreEmotion').value = anime.scores.emotion;
+      updateScoreVal('Emotion', anime.scores.emotion);
 
-      document.getElementById('searchSection').style.display = 'none';
-      document.getElementById('scoringForm').style.display = 'block';
+      document.getElementById('scoreEnding').value = anime.scores.ending;
+      updateScoreVal('Ending', anime.scores.ending);
+
+      document.getElementById('scoreRewatch').value = anime.scores.rewatch;
+      updateScoreVal('Rewatch', anime.scores.rewatch);
 
       document.getElementById('animeModal').classList.add('active');
     }
 
     function createRowHTML(anime, displayRank, isWatchOrder) {
-      const pScore = anime.personalScore !== undefined ? anime.personalScore.toFixed(1) : anime.overall.toFixed(1);
-      const cScore = anime.overall.toFixed(1);
-
       return `
         <tr>
           <td>
@@ -1048,16 +842,7 @@
             </div>
           </td>
           <td style="text-align: center;">
-            <div class="score-display-group">
-              <div class="score-pill-container">
-                <span class="score-pill-tag">CALC</span>
-                <span class="overall-score-pill">${cScore}</span>
-              </div>
-              <div class="score-pill-container">
-                <span class="score-pill-tag">PERSONAL</span>
-                <span class="personal-score-pill">${pScore}</span>
-              </div>
-            </div>
+            <span class="overall-score-pill">${anime.overall.toFixed(1)}</span>
           </td>
           <td style="text-align: center;">
             <div class="action-btns" style="justify-content: center;">
@@ -1074,6 +859,7 @@
     }
 
     function renderTables() {
+      // 1. Render Watch Order Table
       const watchOrderTbody = document.getElementById('watchOrderTableBody');
       const watchEmpty = document.getElementById('watchOrderEmpty');
       
@@ -1085,6 +871,7 @@
         watchOrderTbody.innerHTML = animeList.map((anime, index) => createRowHTML(anime, index + 1, true)).join('');
       }
 
+      // 2. Render Score Rank Table
       const scoreRankTbody = document.getElementById('scoreRankTableBody');
       const scoreEmpty = document.getElementById('scoreRankEmpty');
 
@@ -1093,12 +880,8 @@
         scoreEmpty.style.display = 'block';
       } else {
         scoreEmpty.style.display = 'none';
-        // Sort descending by personalScore (falling back to overall score if personalScore is missing)
-        const sortedList = [...animeList].sort((a, b) => {
-          const scoreA = a.personalScore !== undefined ? a.personalScore : a.overall;
-          const scoreB = b.personalScore !== undefined ? b.personalScore : b.overall;
-          return scoreB - scoreA;
-        });
+        // Sort descending by overall score
+        const sortedList = [...animeList].sort((a, b) => b.overall - a.overall);
         scoreRankTbody.innerHTML = sortedList.map((anime, index) => createRowHTML(anime, index + 1, false)).join('');
       }
     }
@@ -1136,6 +919,7 @@
       reader.readAsText(file);
     }
 
+    // Initial render on load
     renderTables();
   </script>
 </body>
