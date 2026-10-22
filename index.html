@@ -484,6 +484,32 @@
       border-radius: 2px;
     }
 
+    /* Cyberpunk Loading Bar */
+    .loading-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(0, 243, 255, 0.1);
+      margin-top: 6px;
+      position: relative;
+      overflow: hidden;
+      display: none;
+      border-radius: 2px;
+    }
+
+    .loading-bar-progress {
+      position: absolute;
+      width: 40%;
+      height: 100%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+      animation: loadingAnim 1s infinite linear;
+    }
+
+    @keyframes loadingAnim {
+      0% { left: -40%; }
+      100% { left: 100%; }
+    }
+
     .selected-anime-preview {
       border: 1px solid var(--border-glow);
       background: rgba(0, 243, 255, 0.03);
@@ -692,6 +718,7 @@
 
       <form id="animeForm" onsubmit="saveAnime(event)">
         <input type="hidden" id="animeId">
+        <input type="hidden" id="animeTitle" value="">
         <input type="hidden" id="animePoster" value="">
         <input type="hidden" id="animeEpisodes" value="?">
         <input type="hidden" id="animeYear" value="?">
@@ -699,7 +726,10 @@
 
         <div class="form-group" id="searchGroup">
           <label>SEARCH GLOBAL DATABASE *</label>
-          <input type="text" id="animeSearchInput" placeholder="Type any anime name..." oninput="handleSearch(this.value)" autocomplete="off">
+          <input type="text" id="animeSearchInput" placeholder="Type any anime name (Select from list below)..." oninput="handleSearch(this.value)" autocomplete="off">
+          <div class="loading-bar-container" id="searchLoadingBar">
+            <div class="loading-bar-progress"></div>
+          </div>
           <div id="searchResults"></div>
         </div>
 
@@ -802,10 +832,12 @@
       document.getElementById('modalTitle').innerText = "SEARCH & RANK ANIME";
       document.getElementById('animeId').value = "";
       document.getElementById('animeForm').reset();
+      document.getElementById('animeTitle').value = ""; // Clear locked selection
       
       document.getElementById('searchGroup').style.display = 'block';
       document.getElementById('selectedPreview').style.display = 'none';
       document.getElementById('searchResults').style.display = 'none';
+      document.getElementById('searchLoadingBar').style.display = 'none';
 
       document.getElementById('scoreCharacters').value = 8.0;
       document.getElementById('scoreStory').value = 8.0;
@@ -820,9 +852,11 @@
     function closeModal() {
       document.getElementById('animeModal').classList.remove('active');
       document.getElementById('searchResults').style.display = 'none';
+      document.getElementById('searchLoadingBar').style.display = 'none';
     }
 
     function resetSelection() {
+      document.getElementById('animeTitle').value = ""; // Clear locked selection
       document.getElementById('searchGroup').style.display = 'block';
       document.getElementById('selectedPreview').style.display = 'none';
       document.getElementById('animeSearchInput').value = '';
@@ -831,10 +865,16 @@
 
     function handleSearch(query) {
       const resultsContainer = document.getElementById('searchResults');
+      const loadingBar = document.getElementById('searchLoadingBar');
+
       if (!query || query.trim().length < 2) {
         resultsContainer.style.display = 'none';
+        loadingBar.style.display = 'none';
         return;
       }
+
+      // Show loading bar while querying
+      loadingBar.style.display = 'block';
 
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
@@ -844,6 +884,7 @@
             return res.json();
           })
           .then(data => {
+            loadingBar.style.display = 'none';
             if (data && data.data && data.data.length > 0) {
               const formattedResults = data.data.map(anime => ({
                 title: anime.title_english || anime.title,
@@ -858,9 +899,10 @@
             }
           })
           .catch(() => {
+            loadingBar.style.display = 'none';
             fallbackLocalSearch(query);
           });
-      }, 350);
+      }, 300);
     }
 
     function fallbackLocalSearch(query) {
@@ -882,12 +924,14 @@
         `).join('');
         resultsContainer.style.display = 'block';
       } else {
-        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);" onclick="selectCustomAnime('${query.replace(/'/g, "\\'")}')">[ CLICK TO USE TYPED NAME: "${query}" ]</div>`;
+        resultsContainer.innerHTML = `<div style="padding: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);">[ NO ANIME FOUND FROM GLOBAL SEARCH ]</div>`;
         resultsContainer.style.display = 'block';
       }
     }
 
     function selectCatalogAnime(title, poster, episodes, year, type) {
+      // Lock in the selected title
+      document.getElementById('animeTitle').value = title;
       document.getElementById('animePoster').value = poster;
       document.getElementById('animeEpisodes').value = episodes;
       document.getElementById('animeYear').value = year;
@@ -900,26 +944,19 @@
       document.getElementById('searchGroup').style.display = 'none';
       document.getElementById('selectedPreview').style.display = 'flex';
       document.getElementById('searchResults').style.display = 'none';
+      document.getElementById('searchLoadingBar').style.display = 'none';
       document.getElementById('animeSearchInput').value = '';
-    }
-
-    function selectCustomAnime(title) {
-      selectCatalogAnime(title, 'https://via.placeholder.com/150x220/0a0b14/00f3ff?text=NO+COVER', '?', '?', 'TV');
     }
 
     function saveAnime(e) {
       e.preventDefault();
       
       const id = document.getElementById('animeId').value;
-      
-      // Auto-grab whatever is typed in the search input if a selection wasn't officially locked in
-      let title = document.getElementById('previewTitle').innerText;
-      if (!title) {
-        title = document.getElementById('animeSearchInput').value.trim();
-      }
+      const title = document.getElementById('animeTitle').value;
 
-      if (!title) {
-        alert("Please search or type an anime title first!");
+      // Strict enforcement: Must select an anime from the list first
+      if (!title || title.trim() === "") {
+        alert("ACCESS DENIED: You must search and select an anime from the database list before saving!");
         return;
       }
 
@@ -1002,6 +1039,7 @@
 
       document.getElementById('modalTitle').innerText = "EDIT ANIME RANKING";
       document.getElementById('animeId').value = anime.id;
+      document.getElementById('animeTitle').value = anime.title; // Lock title in hidden input
       document.getElementById('animeFormat').value = anime.format || 'TV';
       document.getElementById('animePoster').value = anime.poster;
       document.getElementById('animeEpisodes').value = anime.episodes;
